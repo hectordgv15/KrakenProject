@@ -95,7 +95,7 @@ def get_information_asset(ticker = 'BTCUSD', interval = 1440):
 
 # =========================================================================================================================
 # Site bar
-st.sidebar.image("../images/Logohg.png", caption = "Technological platform for financial services")
+st.sidebar.image("./images/Logohg.png", caption = "Technological platform for financial services")
 
 
 # Select date and asset
