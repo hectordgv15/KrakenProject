@@ -21,7 +21,8 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 
 # Utils
-from utils import get_information_asset, select_box_date, time_series_chart
+from utils import select_box_date
+from analysis_class import Analysis
 
 # Streamlit
 import streamlit as st
@@ -31,9 +32,7 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 st.title("STOCHASTIC OSCILLATOR FOR CRYPTOCURRENCIES")
-st.subheader(
-    "🔔 This is an interactive site where you can see the behavior of all cryptocurrencies"
-)
+st.subheader("🔔 This is an interactive site where you can see the behavior of all cryptocurrencies")
 
 
 # Special effect
@@ -64,28 +63,27 @@ h_plot = 600
 
 # =========================================================================================================================
 # Side bar
-st.sidebar.image(
-    "./images/Logohg.png", caption="Technological platform for financial services"
-)
+st.sidebar.image("./images/Logohg.png", caption="Technological platform for financial services")
 
 selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_options)
 
 
 # Apply
+
+analysis = Analysis()
 # Initial data to set date range
-initial_data = get_information_asset()
+initial_data = analysis.get_data()
 
 selected_date = select_box_date(initial_data, days_plot_dafault)
 
 
 # =========================================================================================================================
 # Dataframe filtered
-daily_data = get_information_asset(ticker=selected_asset, interval=interval)
+daily_data = analysis.get_data(ticker=selected_asset, interval=interval)
+daily_data = analysis.compute_indicators(daily_data)
 
 filtered_data = daily_data[
-    daily_data["date"].between(
-        pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1])
-    )
+    daily_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
 ]
 
 
@@ -131,7 +129,8 @@ with value4:
 # Graphs
 
 # Apply
-fig_1, fig_2 = time_series_chart(filtered_data, selected_asset, w_plot, h_plot)
+fig_1 = analysis.graph_asset(filtered_data, selected_asset, w_plot, h_plot)
+fig_2 = analysis.graph_indicator(filtered_data, selected_asset, w_plot, h_plot)
 
 st.plotly_chart(fig_1)
 st.plotly_chart(fig_2)

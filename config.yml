@@ -1,0 +1,4 @@
+model:
+  stochastic_window: 14  # Compute indicator
+  stochastic_nmean: 3  # Compute indicator
+  window_size_ma: 26  # Compute MA
