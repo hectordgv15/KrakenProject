@@ -59,7 +59,7 @@ from plotly.subplots import make_subplots
 
 
 # Select date and asset
-def select_box_date(inicial_data, days_plot):
+def select_box_date(asset_data, days_plot):
     """
     this function generates the box to select a specific range of dates.
 
@@ -68,16 +68,16 @@ def select_box_date(inicial_data, days_plot):
     start_date = st.sidebar.date_input(
         "Start date",
         (datetime.today() - timedelta(days=days_plot)),
-        min_value=inicial_data["date"].min(),
-        max_value=inicial_data["date"].max(),
+        min_value=asset_data["date"].min(),
+        max_value=asset_data["date"].max(),
     )
 
     try:
         end_date = st.sidebar.date_input(
             "End date",
             datetime.today(),
-            min_value=inicial_data["date"].min(),
-            max_value=inicial_data["date"].max(),
+            min_value=asset_data["date"].min(),
+            max_value=asset_data["date"].max(),
         )
 
     # Sometimes the user make a query when the data is not available because the API have not shown the data yet.
@@ -85,8 +85,8 @@ def select_box_date(inicial_data, days_plot):
         end_date = st.sidebar.date_input(
             "End date",
             datetime.today() - timedelta(days=1),
-            min_value=inicial_data["date"].min(),
-            max_value=inicial_data["date"].max(),
+            min_value=asset_data["date"].min(),
+            max_value=asset_data["date"].max(),
         )
 
     return (start_date, end_date)

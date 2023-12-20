@@ -2,6 +2,8 @@ import yaml
 import krakenex
 from pykrakenapi import KrakenAPI
 
+import streamlit as st
+
 import pandas as pd
 import numpy as np
 
@@ -26,7 +28,7 @@ class Analysis:
         with open(config_path, "r") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
-
+    
     def get_data(self, ticker="BTCUSD", interval=1440):
         """
         This function allows us to calculate the stochastic Oscillator.
@@ -53,7 +55,7 @@ class Analysis:
         The second argument refers to the time interval for the data
         in seconds; for example, to display daily data we need
         indicates how many seconds there are in a day.
-        #"""
+        """
         # if pd.isnull(raw_data):
         #     data = self.raw_data.copy()
         # else:

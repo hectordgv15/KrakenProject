@@ -1,4 +1,4 @@
-# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------
 # Import libraries
 # Data process
 import pandas as pd
@@ -27,7 +27,7 @@ from analysis_class import Analysis
 # Streamlit
 import streamlit as st
 
-# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------
 # Streamlit App initial config
 st.set_page_config(layout="wide")
 
@@ -40,7 +40,7 @@ with st.spinner("Wait for it..."):
     time.sleep(1)
 
 
-# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------
 # Parameters and load data
 # Data
 ticker_options = (
@@ -61,26 +61,22 @@ days_plot_dafault = 180
 w_plot = 1000
 h_plot = 600
 
-# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------
 # Side bar
-st.sidebar.image("./images/Logohg.png", caption="Technological platform for financial services")
+st.sidebar.image("./images/Logohg.png", caption = "Technological platform for financial services")
 
 selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_options)
 
-
 # Apply
-
 analysis = Analysis()
-# Initial data to set date range
-initial_data = analysis.get_data()
 
-selected_date = select_box_date(initial_data, days_plot_dafault)
-
-
-# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------
 # Dataframe filtered
-daily_data = analysis.get_data(ticker=selected_asset, interval=interval)
+daily_data = analysis.get_data(ticker = selected_asset, interval = interval)
 daily_data = analysis.compute_indicators(daily_data)
+
+# Box date
+selected_date = select_box_date(daily_data, days_plot_dafault)
 
 filtered_data = daily_data[
     daily_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
@@ -94,10 +90,10 @@ with st.expander("💹​ Asset information"):
         default=["date", "open", "high", "close", "volume", "pctK", "pctD", "signal"],
     )
 
-    st.dataframe(filtered_data[showData], use_container_width=True)
+    st.dataframe(filtered_data[showData], use_container_width = True)
 
 
-# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------
 # Additional information in boxes
 count_cat = filtered_data["signal"].value_counts()
 cat_buy = count_cat["Buy"]
@@ -106,26 +102,26 @@ cat_sell = count_cat["Sell"]
 avg_return = filtered_data["close"].pct_change().mean() * 100
 avg_price = filtered_data["close"].mean()
 
-value1, value2, value3, value4 = st.columns(4, gap="medium")
+value1, value2, value3, value4 = st.columns(4, gap = "medium")
 
 with value1:
-    st.info("Average return", icon="🚨")
-    st.metric(label="Daily", value=f"{avg_return:,.2f}%")
+    st.info("Average return", icon = "🚨")
+    st.metric(label = "Daily", value = f"{avg_return:,.2f}%")
 
 with value2:
-    st.info("Average price", icon="🚨")
-    st.metric(label="Daily", value=f"{avg_price:,.2f}")
+    st.info("Average price", icon = "🚨")
+    st.metric(label = "Daily", value = f"{avg_price:,.2f}")
 
 with value3:
-    st.info("Buy signals", icon="🚨")
-    st.metric(label="Times", value=f"{cat_buy:,.0f}")
+    st.info("Buy signals", icon = "🚨")
+    st.metric(label = "Times", value = f"{cat_buy:,.0f}")
 
 with value4:
-    st.info("Sell signals", icon="🚨")
-    st.metric(label="Times", value=f"{cat_sell:,.0f}")
+    st.info("Sell signals", icon = "🚨")
+    st.metric(label = "Times", value = f"{cat_sell:,.0f}")
 
 
-# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------
 # Graphs
 
 # Apply
