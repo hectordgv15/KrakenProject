@@ -1,13 +1,13 @@
 
-[ ] Descargar datos. Utilizando la librería Kraken (2 puntos). https://github.com/veox/python3-krakenex
-[ ] Graficar cotizaciones. Input de usuario que permita graficar cualquier cotización o una a elegir en el menú (2 puntos).
+[-] Descargar datos. Utilizando la librería Kraken (2 puntos). https://github.com/veox/python3-krakenex
+[X] Graficar cotizaciones. Input de usuario que permita graficar cualquier cotización o una a elegir en el menú (2 puntos).
 
-[ ] Calcular el estocástico y graficarlo (1 puntos).
-[ ] Calcular el estocástico sobre una media móvil (1 puntos).
-[ ] Graficar el indicador junto con la cotización del par calculado (1 punto).
+[-] Calcular el estocástico y graficarlo (1 puntos).
+[-] Calcular el estocástico sobre una media móvil (1 puntos).
+[-] Graficar el indicador junto con la cotización del par calculado (1 punto).
 
-[ ] Funciones (0,5 puntos)
-[ ] Utilización de clases (0,5 puntos)
+[X] Funciones (0,5 puntos)
+[X] Utilización de clases (0,5 puntos)
 [ ] Manejo de errores y excepciones (0,5 puntos)
 
 - Memoria. (2 puntos)
