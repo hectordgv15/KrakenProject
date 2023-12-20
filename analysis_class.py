@@ -16,6 +16,7 @@ class Analysis:
     def __init__(self):
         self.get_conection()
         self.config = self.load_config()
+        self.data_cache = {}
 
     def get_conection(self):
         # Initialize API
@@ -27,7 +28,7 @@ class Analysis:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    def get_data(self, ticker="BTCUSD", interval=1440):
+    def get_data(self, asset="BTCUSD", interval=1440):
         """
         This function allows us to calculate the stochastic Oscillator.
         The second argument refers to the time interval for the data
@@ -36,28 +37,33 @@ class Analysis:
         """
 
         try:
-            # Extract the information
-            data = self.connection.get_ohlc_data(ticker, interval=interval, ascending=True)[0]
-            data = data.iloc[:, [1, 2, 3, 4, 6]].apply(pd.to_numeric, errors="coerce").reset_index()
-            data = data.rename(columns={"dtime": "date"})
+            data = self.data_cache.get(asset, {}).get("raw", "NO DATA")
 
-            self.raw_data = data.copy()
-            return self.raw_data
+            if data == "NO DATA":
+                # Extract the information
+                data = self.connection.get_ohlc_data(asset, interval=interval, ascending=True)[0]
+                data = data.iloc[:, [1, 2, 3, 4, 6]].apply(pd.to_numeric, errors="coerce").reset_index()
+                data = data.rename(columns={"dtime": "date"})
+                self.data_cache[asset] = {"raw": data}
+
+            return data
 
         except:
             print("There is a problem with the function or its parameters")
 
-    def compute_indicators(self, raw_data=None):
+    def compute_indicators(self, asset="BTCUSD", interval=1440):
         """
         This function allows us to calculate the stochastic Oscillator.
         The second argument refers to the time interval for the data
         in seconds; for example, to display daily data we need
         indicates how many seconds there are in a day.
-        #"""
-        # if pd.isnull(raw_data):
-        #     data = self.raw_data.copy()
-        # else:
-        #     data = raw_data.copy()
+        """
+        raw_data = self.data_cache.get(asset, {}).get("raw", "NO DATA")
+
+        # if raw_data == "NO DATA":
+        #     print(f"Warning. No existing raw data for {asset}")
+        #     raw_data = self.get_data(asset=asset, interval=interval)
+
         data = raw_data.copy()
 
         model_config = self.config["model"]
@@ -73,9 +79,9 @@ class Analysis:
         # Define sell and buy signals
         data["signal"] = np.where(data["pctK"] > data["pctD"], "Buy", "Sell")
 
-        self.asset_data = data.copy()
+        self.data_cache[asset]["data"] = data
 
-        return self.asset_data
+        return data
 
     def graph_asset(self, data, asset, width, height):
         # Basic plot
@@ -123,7 +129,7 @@ class Analysis:
             go.Scatter(x=data["date"], y=data["close"], name="Close", line=dict(color="black")),
             secondary_y=True,
         )
-        fig_2.update_layout(title_text=f"☑️​ ​Stochastic Oscillator: {asset}")
+        fig_2.update_layout(title_text=f"☑️​ Stochastic Oscillator: {asset}")
         fig_2.update_xaxes(
             rangeslider_visible=True,
             rangeselector=dict(

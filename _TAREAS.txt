@@ -1,0 +1,23 @@
+
+[ ] Descargar datos. Utilizando la librería Kraken (2 puntos). https://github.com/veox/python3-krakenex
+[ ] Graficar cotizaciones. Input de usuario que permita graficar cualquier cotización o una a elegir en el menú (2 puntos).
+
+[ ] Calcular el estocástico y graficarlo (1 puntos).
+[ ] Calcular el estocástico sobre una media móvil (1 puntos).
+[ ] Graficar el indicador junto con la cotización del par calculado (1 punto).
+
+[ ] Funciones (0,5 puntos)
+[ ] Utilización de clases (0,5 puntos)
+[ ] Manejo de errores y excepciones (0,5 puntos)
+
+- Memoria. (2 puntos)
+[ ] Descripción de cómo se ha afrontado el proyecto y por qué.
+[ ] Descripción detallada de cada uno de los puntos que se evalúan.
+[ ] Descripción de la estructura del código y estructura de ficheros.
+[ ] Descripción de la forma de ejecución del código.
+[ ] Pantallazos de todo Aquel punto que requiera algún tipo de visualización.
+
+- Extra.
+[ ] Testeo y cobertura (unit-testing, integration-testing) 0,25 puntos
+[ ] Facilitar los mecanismos para la reproducción del entorno virtual (ya sea con Poetry, Pipenv o pip) 0,25 puntos
+[ ] Distribución del proyecto a través de PyPi o una plataforma PaaS (AWS, Heroku, etc) 0,25 puntos

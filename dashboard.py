@@ -79,8 +79,8 @@ selected_date = select_box_date(initial_data, days_plot_dafault)
 
 # =========================================================================================================================
 # Dataframe filtered
-daily_data = analysis.get_data(ticker=selected_asset, interval=interval)
-daily_data = analysis.compute_indicators(daily_data)
+daily_data = analysis.get_data(asset=selected_asset, interval=interval)
+daily_data = analysis.compute_indicators(asset=selected_asset, interval=interval)
 
 filtered_data = daily_data[
     daily_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
