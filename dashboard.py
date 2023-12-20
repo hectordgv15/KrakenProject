@@ -69,21 +69,18 @@ selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_
 
 
 # Apply
-
 analysis = Analysis()
-# Initial data to set date range
-initial_data = analysis.get_data()
-
-selected_date = select_box_date(initial_data, days_plot_dafault)
 
 
 # =========================================================================================================================
 # Dataframe filtered
-daily_data = analysis.get_data(asset=selected_asset, interval=interval)
-daily_data = analysis.compute_indicators(asset=selected_asset, interval=interval)
+asset_data = analysis.get_data(asset=selected_asset, interval=interval)
+asset_data = analysis.compute_indicators(asset=selected_asset, interval=interval)
 
-filtered_data = daily_data[
-    daily_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
+selected_date = select_box_date(asset_data, days_plot_dafault)
+
+filtered_data = asset_data[
+    asset_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
 ]
 
 

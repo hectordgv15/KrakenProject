@@ -111,6 +111,8 @@ class Analysis:
         fig_1.update_yaxes(title_text="Close price")
         fig_1.update_xaxes(title_text="Date")
         fig_1.update_layout(width=width, height=height)
+        
+        
 
         return fig_1
 
