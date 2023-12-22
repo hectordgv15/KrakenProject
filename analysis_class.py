@@ -11,6 +11,9 @@ import plotly.express as px
 import plotly.io as pio
 from plotly.subplots import make_subplots
 
+from exception import CustomException
+import sys
+
 
 class Analysis:
     def __init__(self):
@@ -28,7 +31,7 @@ class Analysis:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    def get_data(self, asset="BTCUSD", interval=1440):
+    def get_data(self, asset="BTC-USD", interval=1440):
         """
         This function allows us to calculate the stochastic Oscillator.
         The second argument refers to the time interval for the data
@@ -47,9 +50,10 @@ class Analysis:
                 self.data_cache[asset] = {"raw": data}
 
             return data
+            
+        except Exception as e:
+            raise CustomException(e, sys)
 
-        except:
-            print("There is a problem with the function or its parameters")
 
     def compute_indicators(self, asset="BTCUSD", interval=1440):
         """
@@ -68,20 +72,25 @@ class Analysis:
 
         model_config = self.config["model"]
 
-        # Compute stochastic oscillator
-        data["MA26"] = data["close"].rolling(window=model_config["window_size_ma"]).mean()
-        data["period_high"] = data["high"].rolling(model_config["stochastic_window"]).max()
-        data["period_low"] = data["low"].rolling(model_config["stochastic_window"]).min()
-        data["pctK"] = ((data["close"] - data["period_low"]) / (data["period_high"] - data["period_low"])) * 100
-        data["pctD"] = data["pctK"].rolling(model_config["stochastic_nmean"]).mean()
-        data = data.dropna().reset_index(drop=True)
+        try:
+            # Compute stochastic oscillator
+            data["MA26"] = data["close"].rolling(window=model_config["window_size_ma"]).mean()
+            data["period_high"] = data["high"].rolling(model_config["stochastic_window"]).max()
+            data["period_low"] = data["low"].rolling(model_config["stochastic_window"]).min()
+            data["pctK"] = ((data["close"] - data["period_low"]) / (data["period_high"] - data["period_low"])) * 100
+            data["pctD"] = data["pctK"].rolling(model_config["stochastic_nmean"]).mean()
+            data = data.dropna().reset_index(drop=True)
 
-        # Define sell and buy signals
-        data["signal"] = np.where(data["pctK"] > data["pctD"], "Buy", "Sell")
+            # Define sell and buy signals
+            data["signal"] = np.where(data["pctK"] > data["pctD"], "Buy", "Sell")
 
-        self.data_cache[asset]["data"] = data
+            self.data_cache[asset]["data"] = data
 
-        return data
+            return data
+        
+        except Exception as e:
+            raise CustomException(e, sys)
+
 
     def graph_asset(self, data, asset, width, height):
         # Basic plot
