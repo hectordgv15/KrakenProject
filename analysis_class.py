@@ -16,6 +16,8 @@ from plotly.subplots import make_subplots
 from exception import CustomException
 import sys
 
+import requests
+
 
 class Analysis:
     def __init__(self):
@@ -33,7 +35,7 @@ class Analysis:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    def get_data(self, asset="BTC-USD", interval=1440):
+    def get_data(self, asset="BTCUSD", interval=1440):
         """
         This function allows us to calculate the stochastic Oscillator.
         The second argument refers to the time interval for the data
@@ -55,7 +57,24 @@ class Analysis:
             
         except Exception as e:
             raise CustomException(e, sys)
+        
+    
+    def get_crypto_pairs(self):
+        url = 'https://api.kraken.com/0/public/AssetPairs'
+        response = requests.get(url)
 
+        try:
+            pairs_data = response.json()
+            pairs = pairs_data['result'].keys()
+            return pairs
+        
+        except:
+            return(
+                ["BTCUSD", "ETHUSD", "USDTUSD", "XRPUSD", 
+                    "USDCUSD", "SOLUSD", "ADAUASD", "DOGEUSD", 
+                    "TRXUSD"]
+                )
+    
 
     def compute_indicators(self, asset="BTCUSD", interval=1440):
         """
@@ -76,7 +95,7 @@ class Analysis:
 
         try:
             # Compute stochastic oscillator
-            data["MA26"] = data["close"].rolling(window=model_config["window_size_ma"]).mean()
+            data["MA"] = data["close"].rolling(window=model_config["window_size_ma"]).mean()
             data["period_high"] = data["high"].rolling(model_config["stochastic_window"]).max()
             data["period_low"] = data["low"].rolling(model_config["stochastic_window"]).min()
             data["pctK"] = ((data["close"] - data["period_low"]) / (data["period_high"] - data["period_low"])) * 100
@@ -94,57 +113,77 @@ class Analysis:
             raise CustomException(e, sys)
 
 
+
+
     def graph_asset(self, data, asset, width, height):
-        # Basic plot
-        fig_1 = px.line(
-            data,
-            x="date",
-            y=["close", "MA26"],
-            title=f" ☑️​​ {asset}",
-            color_discrete_map={"close": "black", "MA26": "green"},
+        # Basic plot with MA
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.7, 0.3])
+
+        fig.add_trace(
+            go.Scatter(x=data["date"], y=data["close"], mode='lines', name="Close", line=dict(color='black')),
+            row=1, col=1
         )
 
-        fig_1.update_xaxes(
-            rangeslider_visible=True,
-            rangeselector=dict(
-                buttons=list(
-                    [
-                        dict(count=1, label="1m", step="month", stepmode="backward"),
-                        dict(count=6, label="6m", step="month", stepmode="backward"),
-                        dict(count=1, label="YTD", step="year", stepmode="todate"),
-                        dict(count=1, label="1y", step="year", stepmode="backward"),
-                        dict(step="all"),
-                    ]
+        fig.add_trace(
+            go.Scatter(x=data["date"], y=data["MA"], mode='lines', name="MA", line=dict(color='green')),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Bar(x=data["date"], y=data["volume"], name="Volume", marker_color="#FF8300"),
+            row=2, col=1
+        )
+
+        fig.update_yaxes(title_text="Close price", row=1, col=1)
+        fig.update_xaxes(title_text="Date", row=1, col=1)
+
+        fig.update_yaxes(title_text="Volume", row=2, col=1)
+        fig.update_xaxes(title_text="Date", row=2, col=1)
+
+        fig.update_layout(
+            title_text=f" ☑️​ Moving average and volume:​ {asset}",
+            showlegend=True,
+            height=height,
+            width=width,
+            xaxis=dict(
+                rangeselector=dict(
+                    buttons=list(
+                        [
+                            dict(count=1, label="1m", step="month", stepmode="backward"),
+                            dict(count=6, label="6m", step="month", stepmode="backward"),
+                            dict(count=1, label="YTD", step="year", stepmode="todate"),
+                            dict(count=1, label="1y", step="year", stepmode="backward"),
+                            dict(step="all"),
+                        ]
+                    )
                 )
-            ),
+            )
         )
 
-        fig_1.update_yaxes(title_text="Close price")
-        fig_1.update_xaxes(title_text="Date")
-        fig_1.update_layout(width=width, height=height)
-        
-        
+        return fig
 
-        return fig_1
+
+
 
     def graph_indicator(self, data, asset, width, height):
         # Graph of indicator
-        fig_2 = make_subplots(specs=[[{"secondary_y": True}]])
-        fig_2.add_trace(
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        fig.add_trace(
             go.Scatter(x=data["date"], y=data["pctK"], name="%K", line=dict(color="#FF8300")),
             secondary_y=False,
         )
-        fig_2.add_trace(
+        fig.add_trace(
             go.Scatter(x=data["date"], y=data["pctD"], name="%D", line=dict(color="green")),
             secondary_y=False,
         )
-        fig_2.add_trace(
+        fig.add_trace(
             go.Scatter(x=data["date"], y=data["close"], name="Close", line=dict(color="black")),
             secondary_y=True,
         )
-        fig_2.update_layout(title_text=f"☑️​ Stochastic Oscillator: {asset}")
-        fig_2.update_xaxes(
-            rangeslider_visible=True,
+
+        
+        fig.update_layout(title_text=f"☑️​ Stochastic Oscillator: {asset}")
+        fig.update_xaxes(
             rangeselector=dict(
                 buttons=list(
                     [
@@ -157,9 +196,21 @@ class Analysis:
                 )
             ),
         )
-        fig_2.update_xaxes(title_text="Date")
-        fig_2.update_yaxes(title_text="Indicator (%K, %D)", secondary_y=False)
-        fig_2.update_yaxes(title_text="Close price", secondary_y=True)
-        fig_2.update_layout(width=width, height=height)
+        fig.update_xaxes(title_text="Date")
+        fig.update_yaxes(title_text="Indicator (%K, %D)", secondary_y=False)
+        fig.update_yaxes(title_text="Close price", secondary_y=True)
+        fig.update_layout(width=width, height=height)
 
-        return fig_2
+        return fig
+    
+
+
+
+
+    
+
+
+    
+
+    
+

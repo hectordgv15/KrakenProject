@@ -43,32 +43,24 @@ with st.spinner("Wait for it..."):
 # -------------------------------------------------------------------------------------------------
 # Parameters and load data
 # Data
-ticker_options = (
-    "BTCUSD",
-    "ETHUSD",
-    "USDTUSD",
-    "XRPUSD",
-    "USDCUSD",
-    "SOLUSD",
-    "ADAUASD",
-    "DOGEUSD",
-    "TRXUSD",
-)  # Get information
+# Apply
+analysis = Analysis()
+
+ticker_options = analysis.get_crypto_pairs()
+
+
 interval = 1440
 
 # graph
-days_plot_dafault = 180
+days_plot_dafault = 365
 w_plot = 1000
 h_plot = 600
 
 # -------------------------------------------------------------------------------------------------
 # Side bar
-st.sidebar.image("./images/Logohg.png", caption = "Technological platform for financial services")
+st.sidebar.image("./images/Logov2.png", caption = "Technological platform for financial services")
 
 selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_options)
-
-# Apply
-analysis = Analysis()
 
 
 # =========================================================================================================================
