@@ -2,23 +2,6 @@
 # Import libraries
 # Data process
 import pandas as pd
-import numpy as np
-
-# Krakenex library
-import krakenex
-from pykrakenapi import KrakenAPI
-
-# Dates
-import time
-import datetime
-from datetime import datetime, timedelta
-
-# Graphics
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import plotly.express as px
-import plotly.io as pio
-from plotly.subplots import make_subplots
 
 # Utils
 from utils import select_box_date
@@ -35,11 +18,6 @@ st.title("STOCHASTIC OSCILLATOR FOR CRYPTOCURRENCIES")
 st.subheader("🔔 This is an interactive site where you can see the behavior of all cryptocurrencies")
 
 
-# Special effect
-with st.spinner("Wait for it..."):
-    time.sleep(1)
-
-
 # -------------------------------------------------------------------------------------------------
 # Parameters and load data
 # Data
@@ -47,7 +25,6 @@ with st.spinner("Wait for it..."):
 analysis = Analysis()
 
 ticker_options = analysis.get_crypto_pairs()
-
 
 interval = 1440
 
@@ -58,7 +35,7 @@ h_plot = 600
 
 # -------------------------------------------------------------------------------------------------
 # Side bar
-st.sidebar.image("./images/Logov2.png", caption = "Technological platform for financial services")
+st.sidebar.image("./images/Logov2.png", caption="Technological platform for financial services")
 
 selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_options)
 
@@ -82,7 +59,7 @@ with st.expander("💹​ Asset information"):
         default=["date", "open", "high", "close", "volume", "pctK", "pctD", "signal"],
     )
 
-    st.dataframe(filtered_data[showData], use_container_width = True)
+    st.dataframe(filtered_data[showData], use_container_width=True)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -94,23 +71,23 @@ cat_sell = count_cat["Sell"]
 avg_return = filtered_data["close"].pct_change().mean() * 100
 avg_price = filtered_data["close"].mean()
 
-value1, value2, value3, value4 = st.columns(4, gap = "medium")
+value1, value2, value3, value4 = st.columns(4, gap="medium")
 
 with value1:
-    st.info("Average return", icon = "🚨")
-    st.metric(label = "Daily", value = f"{avg_return:,.2f}%")
+    st.info("Average return", icon="🚨")
+    st.metric(label="Daily", value=f"{avg_return:,.2f}%")
 
 with value2:
-    st.info("Average price", icon = "🚨")
-    st.metric(label = "Daily", value = f"{avg_price:,.2f}")
+    st.info("Average price", icon="🚨")
+    st.metric(label="Daily", value=f"{avg_price:,.2f}")
 
 with value3:
-    st.info("Buy signals", icon = "🚨")
-    st.metric(label = "Times", value = f"{cat_buy:,.0f}")
+    st.info("Buy signals", icon="🚨")
+    st.metric(label="Times", value=f"{cat_buy:,.0f}")
 
 with value4:
-    st.info("Sell signals", icon = "🚨")
-    st.metric(label = "Times", value = f"{cat_sell:,.0f}")
+    st.info("Sell signals", icon="🚨")
+    st.metric(label="Times", value=f"{cat_sell:,.0f}")
 
 
 # -------------------------------------------------------------------------------------------------

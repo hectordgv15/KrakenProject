@@ -2,8 +2,6 @@ import yaml
 import krakenex
 from pykrakenapi import KrakenAPI
 
-import streamlit as st
-
 import pandas as pd
 import numpy as np
 
@@ -44,37 +42,35 @@ class Analysis:
         """
 
         try:
-            data = self.data_cache.get(asset, {}).get("raw", "NO DATA")
+            data = self.data_cache.get(asset, {}).get("raw", "NO_DATA")
 
-            if data == "NO DATA":
+            if all(data == "NO_DATA"):
                 # Extract the information
                 data = self.connection.get_ohlc_data(asset, interval=interval, ascending=True)[0]
-                data = data.iloc[:, [1, 2, 3, 4, 6]].apply(pd.to_numeric, errors="coerce").reset_index()
+
+                # Process data
+                selected_columns = ["open", "high", "low", "close", "volume"]
+                data = data[selected_columns].apply(pd.to_numeric, errors="coerce").reset_index()
                 data = data.rename(columns={"dtime": "date"})
+
                 self.data_cache[asset] = {"raw": data}
 
             return data
-            
+
         except Exception as e:
             raise CustomException(e, sys)
-        
-    
+
     def get_crypto_pairs(self):
-        url = 'https://api.kraken.com/0/public/AssetPairs'
+        url = "https://api.kraken.com/0/public/AssetPairs"
         response = requests.get(url)
 
         try:
             pairs_data = response.json()
-            pairs = pairs_data['result'].keys()
+            pairs = pairs_data["result"].keys()
             return pairs
-        
+
         except:
-            return(
-                ["BTCUSD", "ETHUSD", "USDTUSD", "XRPUSD", 
-                    "USDCUSD", "SOLUSD", "ADAUASD", "DOGEUSD", 
-                    "TRXUSD"]
-                )
-    
+            return ["BTCUSD", "ETHUSD", "USDTUSD", "XRPUSD", "USDCUSD", "SOLUSD", "ADAUASD", "DOGEUSD", "TRXUSD"]
 
     def compute_indicators(self, asset="BTCUSD", interval=1440):
         """
@@ -83,11 +79,11 @@ class Analysis:
         in seconds; for example, to display daily data we need
         indicates how many seconds there are in a day.
         """
-        raw_data = self.data_cache.get(asset, {}).get("raw", "NO DATA")
+        raw_data = self.data_cache.get(asset, {}).get("raw", "NO_DATA")
 
-        # if raw_data == "NO DATA":
-        #     print(f"Warning. No existing raw data for {asset}")
-        #     raw_data = self.get_data(asset=asset, interval=interval)
+        if all(raw_data == "NO_DATA"):
+            print(f"Warning. No existing raw data for {asset}")
+            raw_data = self.get_data(asset=asset, interval=interval)
 
         data = raw_data.copy()
 
@@ -108,31 +104,25 @@ class Analysis:
             self.data_cache[asset]["data"] = data
 
             return data
-        
+
         except Exception as e:
             raise CustomException(e, sys)
-
-
-
 
     def graph_asset(self, data, asset, width, height):
         # Basic plot with MA
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.7, 0.3])
 
         fig.add_trace(
-            go.Scatter(x=data["date"], y=data["close"], mode='lines', name="Close", line=dict(color='black')),
-            row=1, col=1
+            go.Scatter(x=data["date"], y=data["close"], mode="lines", name="Close", line=dict(color="black")),
+            row=1,
+            col=1,
         )
 
         fig.add_trace(
-            go.Scatter(x=data["date"], y=data["MA"], mode='lines', name="MA", line=dict(color='green')),
-            row=1, col=1
+            go.Scatter(x=data["date"], y=data["MA"], mode="lines", name="MA", line=dict(color="green")), row=1, col=1
         )
 
-        fig.add_trace(
-            go.Bar(x=data["date"], y=data["volume"], name="Volume", marker_color="#FF8300"),
-            row=2, col=1
-        )
+        fig.add_trace(go.Bar(x=data["date"], y=data["volume"], name="Volume", marker_color="#FF8300"), row=2, col=1)
 
         fig.update_yaxes(title_text="Close price", row=1, col=1)
         fig.update_xaxes(title_text="Date", row=1, col=1)
@@ -157,13 +147,10 @@ class Analysis:
                         ]
                     )
                 )
-            )
+            ),
         )
 
         return fig
-
-
-
 
     def graph_indicator(self, data, asset, width, height):
         # Graph of indicator
@@ -181,7 +168,6 @@ class Analysis:
             secondary_y=True,
         )
 
-        
         fig.update_layout(title_text=f"☑️​ Stochastic Oscillator: {asset}")
         fig.update_xaxes(
             rangeselector=dict(
@@ -202,15 +188,3 @@ class Analysis:
         fig.update_layout(width=width, height=height)
 
         return fig
-    
-
-
-
-
-    
-
-
-    
-
-    
-

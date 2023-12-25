@@ -6,8 +6,7 @@ from datetime import datetime, timedelta
 # Select date and asset
 def select_box_date(asset_data, days_plot):
     """
-    this function generates the box to select a specific range of dates.
-
+    This function generates the box to select a specific range of dates.
     """
 
     start_date = st.sidebar.date_input(
