@@ -23,6 +23,7 @@
 [ ] Distribución del proyecto a través de PyPi o una plataforma PaaS (AWS, Heroku, etc) 0,25 puntos (Aziz y Hector)
 [ ] Mejor manejo de errores (Hector)
 [ ] Incluir mayor cantidad de activos a través del API de Kraken (Hector)
+[X] Usar "krakenex" en vez de "pykrakenexapi"
 
 Preguntas:
 1. Cálculo del estocástico sobre media móvil (URGENTE)

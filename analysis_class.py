@@ -1,20 +1,14 @@
 import yaml
 import krakenex
-from pykrakenapi import KrakenAPI
-
-import pandas as pd
 import numpy as np
+import sys
+import requests
+from exception import CustomException
 
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-import plotly.express as px
-import plotly.io as pio
 from plotly.subplots import make_subplots
 
-from exception import CustomException
-import sys
-
-import requests
+from utils import process_response
 
 
 class Analysis:
@@ -25,15 +19,14 @@ class Analysis:
 
     def get_conection(self):
         # Initialize API
-        api = krakenex.API()
-        self.connection = KrakenAPI(api)
+        self.connection = krakenex.API()
 
     def load_config(self, config_path="config.yml"):
         with open(config_path, "r") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
-    def get_data(self, asset="BTCUSD", interval=1440):
+    def get_data(self, pair="BTCUSD", interval=1440, **kwargs):
         """
         This function allows us to calculate the stochastic Oscillator.
         The second argument refers to the time interval for the data
@@ -42,18 +35,26 @@ class Analysis:
         """
 
         try:
-            data = self.data_cache.get(asset, {}).get("raw", "NO_DATA")
+            data = self.data_cache.get(pair, {}).get("raw", "NO_DATA")
 
-            if all(data == "NO_DATA"):
+            if isinstance(data, str):
                 # Extract the information
-                data = self.connection.get_ohlc_data(asset, interval=interval, ascending=True)[0]
+                params = {
+                    "pair": pair,
+                    "interval": interval,
+                    **kwargs,
+                }
+                response = self.connection.query_public("OHLC", params)
 
-                # Process data
-                selected_columns = ["open", "high", "low", "close", "volume"]
-                data = data[selected_columns].apply(pd.to_numeric, errors="coerce").reset_index()
-                data = data.rename(columns={"dtime": "date"})
+                # Response error raise
+                if response["error"]:
+                    raise response["error"][0]
 
-                self.data_cache[asset] = {"raw": data}
+                # Process response
+                data = process_response(response)
+
+                # Save cache data
+                self.data_cache[pair] = {"raw": data}
 
             return data
 
@@ -72,18 +73,18 @@ class Analysis:
         except:
             return ["BTCUSD", "ETHUSD", "USDTUSD", "XRPUSD", "USDCUSD", "SOLUSD", "ADAUASD", "DOGEUSD", "TRXUSD"]
 
-    def compute_indicators(self, asset="BTCUSD", interval=1440):
+    def compute_indicators(self, pair="BTCUSD", interval=1440, **kwargs):
         """
         This function allows us to calculate the stochastic Oscillator.
         The second argument refers to the time interval for the data
         in seconds; for example, to display daily data we need
         indicates how many seconds there are in a day.
         """
-        raw_data = self.data_cache.get(asset, {}).get("raw", "NO_DATA")
+        raw_data = self.data_cache.get(pair, {}).get("raw", "NO_DATA")
 
-        if all(raw_data == "NO_DATA"):
-            print(f"Warning. No existing raw data for {asset}")
-            raw_data = self.get_data(asset=asset, interval=interval)
+        if isinstance(raw_data, str):
+            print(f"Warning. No existing raw data for {pair}")
+            raw_data = self.get_data(kwargs, pair=pair, interval=interval)
 
         data = raw_data.copy()
 
@@ -101,14 +102,14 @@ class Analysis:
             # Define sell and buy signals
             data["signal"] = np.where(data["pctK"] > data["pctD"], "Buy", "Sell")
 
-            self.data_cache[asset]["data"] = data
+            self.data_cache[pair]["data"] = data
 
             return data
 
         except Exception as e:
             raise CustomException(e, sys)
 
-    def graph_asset(self, data, asset, width, height):
+    def graph_pair(self, data, pair, width, height):
         # Basic plot with MA
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.7, 0.3])
 
@@ -131,7 +132,7 @@ class Analysis:
         fig.update_xaxes(title_text="Date", row=2, col=1)
 
         fig.update_layout(
-            title_text=f" ☑️​ Moving average and volume:​ {asset}",
+            title_text=f" ☑️​ Moving average and volume:​ {pair}",
             showlegend=True,
             height=height,
             width=width,
@@ -152,7 +153,7 @@ class Analysis:
 
         return fig
 
-    def graph_indicator(self, data, asset, width, height):
+    def graph_indicator(self, data, pair, width, height):
         # Graph of indicator
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         fig.add_trace(
@@ -168,7 +169,7 @@ class Analysis:
             secondary_y=True,
         )
 
-        fig.update_layout(title_text=f"☑️​ Stochastic Oscillator: {asset}")
+        fig.update_layout(title_text=f"☑️​ Stochastic Oscillator: {pair}")
         fig.update_xaxes(
             rangeselector=dict(
                 buttons=list(

@@ -42,8 +42,8 @@ selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_
 
 # =========================================================================================================================
 # Dataframe filtered
-asset_data = analysis.get_data(asset=selected_asset, interval=interval)
-asset_data = analysis.compute_indicators(asset=selected_asset, interval=interval)
+asset_data = analysis.get_data(pair=selected_asset, interval=interval)
+asset_data = analysis.compute_indicators(pair=selected_asset, interval=interval)
 
 selected_date = select_box_date(asset_data, days_plot_dafault)
 
@@ -94,7 +94,7 @@ with value4:
 # Graphs
 
 # Apply
-fig_1 = analysis.graph_asset(filtered_data, selected_asset, w_plot, h_plot)
+fig_1 = analysis.graph_pair(filtered_data, selected_asset, w_plot, h_plot)
 fig_2 = analysis.graph_indicator(filtered_data, selected_asset, w_plot, h_plot)
 
 st.plotly_chart(fig_1)

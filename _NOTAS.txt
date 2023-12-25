@@ -2,7 +2,11 @@ NOTAS AZIZ:
 - eliminar selección all en los gráficos, opinion?
 - y si eliminamos el filtro por fecha?
 - he usado pep8 para el formateo (merece la pena mencionarlo creo)
-- puede que el profe ponga pegas por usar pykrakenexapi
+- puede que el profe ponga pegas por usar pykrakenexapi (CAMBIADO)
+- raise error en api response (usar custom exception)
+- custom exception, cambiarle el nombre quizás?
+- revisar TODOs: dentro del codigo
+
 
 -------------------------
 
