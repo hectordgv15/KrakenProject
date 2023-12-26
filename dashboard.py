@@ -1,4 +1,4 @@
-# -------------------------------------------------------------------------------------------------
+
 # Import libraries
 # Data process
 import pandas as pd
@@ -10,92 +10,89 @@ from analysis_class import Analysis
 # Streamlit
 import streamlit as st
 
-# -------------------------------------------------------------------------------------------------
-# Streamlit App initial config
-st.set_page_config(layout="wide")
 
-st.title("STOCHASTIC OSCILLATOR FOR CRYPTOCURRENCIES")
-st.subheader("🔔 This is an interactive site where you can see the behavior of all cryptocurrencies")
+if __name__=='__main__':
+    # Streamlit App initial config
+    st.set_page_config(layout="wide")
 
-
-# -------------------------------------------------------------------------------------------------
-# Parameters and load data
-# Data
-# Apply
-analysis = Analysis()
-
-ticker_options = analysis.get_crypto_pairs()
-
-interval = 1440
-
-# graph
-days_plot_dafault = 365
-w_plot = 1000
-h_plot = 600
-
-# -------------------------------------------------------------------------------------------------
-# Side bar
-st.sidebar.image("./images/Logov2.png", caption="Technological platform for financial services")
-
-selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_options)
+    st.title("STOCHASTIC OSCILLATOR FOR CRYPTOCURRENCIES")
+    st.subheader("🔔 This is an interactive site where you can see the behavior of all cryptocurrencies")
 
 
-# =========================================================================================================================
-# Dataframe filtered
-asset_data = analysis.get_data(pair=selected_asset, interval=interval)
-asset_data = analysis.compute_indicators(pair=selected_asset, interval=interval)
 
-selected_date = select_box_date(asset_data, days_plot_dafault)
+    # Parameters and load data
+    # Data
+    # Apply
+    analysis = Analysis()
 
-filtered_data = asset_data[
-    asset_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
-]
+    ticker_options = analysis.get_crypto_pairs()
 
+    interval = 1440
 
-with st.expander("💹​ Asset information"):
-    showData = st.multiselect(
-        "Filter: ",
-        filtered_data.columns,
-        default=["date", "open", "high", "close", "volume", "pctK", "pctD", "signal"],
-    )
-
-    st.dataframe(filtered_data[showData], use_container_width=True)
+    # graph
+    days_plot_dafault = 365
+    w_plot = 1000
+    h_plot = 600
 
 
-# -------------------------------------------------------------------------------------------------
-# Additional information in boxes
-count_cat = filtered_data["signal"].value_counts()
-cat_buy = count_cat["Buy"]
-cat_sell = count_cat["Sell"]
+    # Side bar
+    st.sidebar.image("./images/Logov2.png", caption="Technological platform for financial services")
 
-avg_return = filtered_data["close"].pct_change().mean() * 100
-avg_price = filtered_data["close"].mean()
+    selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_options)
+    
 
-value1, value2, value3, value4 = st.columns(4, gap="medium")
+    # Dataframe filtered
+    asset_data = analysis.get_data(pair=selected_asset, interval=interval)
+    asset_data = analysis.compute_indicators(pair=selected_asset, interval=interval)
 
-with value1:
-    st.info("Average return", icon="🚨")
-    st.metric(label="Daily", value=f"{avg_return:,.2f}%")
+    selected_date = select_box_date(asset_data, days_plot_dafault)
 
-with value2:
-    st.info("Average price", icon="🚨")
-    st.metric(label="Daily", value=f"{avg_price:,.2f}")
-
-with value3:
-    st.info("Buy signals", icon="🚨")
-    st.metric(label="Times", value=f"{cat_buy:,.0f}")
-
-with value4:
-    st.info("Sell signals", icon="🚨")
-    st.metric(label="Times", value=f"{cat_sell:,.0f}")
+    filtered_data = asset_data[
+        asset_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
+    ]
 
 
-# -------------------------------------------------------------------------------------------------
-# Graphs
+    with st.expander("💹​ Asset information"):
+        showData = st.multiselect(
+            "Filter: ",
+            filtered_data.columns,
+            default=["date", "open", "high", "close", "volume", "pctK", "pctD", "signal"],
+        )
 
-# Apply
-fig_1 = analysis.graph_pair(filtered_data, selected_asset, w_plot, h_plot)
-fig_2 = analysis.graph_indicator(filtered_data, selected_asset, w_plot, h_plot)
+        st.dataframe(filtered_data[showData], use_container_width=True)
 
-st.plotly_chart(fig_1)
-st.plotly_chart(fig_2)
+
+
+    # Additional information in boxes
+    count_cat = filtered_data["signal"].value_counts()
+    cat_buy = count_cat["Buy"]
+    cat_sell = count_cat["Sell"]
+
+    avg_return = filtered_data["close"].pct_change().mean() * 100
+    avg_price = filtered_data["close"].mean()
+
+    value1, value2, value3, value4 = st.columns(4, gap="medium")
+
+    with value1:
+        st.info("Average return", icon="🚨")
+        st.metric(label="Daily", value=f"{avg_return:,.2f}%")
+
+    with value2:
+        st.info("Average price", icon="🚨")
+        st.metric(label="Daily", value=f"{avg_price:,.2f}")
+
+    with value3:
+        st.info("Buy signals", icon="🚨")
+        st.metric(label="Times", value=f"{cat_buy:,.0f}")
+
+    with value4:
+        st.info("Sell signals", icon="🚨")
+        st.metric(label="Times", value=f"{cat_sell:,.0f}")
+
+
+
+    # Graphs
+    fig = analysis.graph_pair(filtered_data, selected_asset, w_plot, h_plot)
+
+    st.plotly_chart(fig)
+    
