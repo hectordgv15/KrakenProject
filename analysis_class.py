@@ -3,7 +3,7 @@ import krakenex
 import numpy as np
 import sys
 import requests
-from exception import CustomException
+from exception import DashboardException
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -59,7 +59,7 @@ class Analysis:
             return data
 
         except Exception as e:
-            raise CustomException(e, sys)
+            raise DashboardException(e, sys)
 
     def get_crypto_pairs(self):
         url = "https://api.kraken.com/0/public/AssetPairs"
@@ -93,10 +93,13 @@ class Analysis:
         try:
             # Compute stochastic oscillator
             data["MA"] = data["close"].rolling(window=model_config["window_size_ma"]).mean()
+            
             data["period_high"] = data["high"].rolling(model_config["stochastic_window"]).max()
             data["period_low"] = data["low"].rolling(model_config["stochastic_window"]).min()
             data["pctK"] = ((data["close"] - data["period_low"]) / (data["period_high"] - data["period_low"])) * 100
             data["pctD"] = data["pctK"].rolling(model_config["stochastic_nmean"]).mean()
+            
+                
             data = data.dropna().reset_index(drop=True)
 
             # Define sell and buy signals
@@ -107,85 +110,105 @@ class Analysis:
             return data
 
         except Exception as e:
-            raise CustomException(e, sys)
+            raise DashboardException(e, sys)
+
 
     def graph_pair(self, data, pair, width, height):
-        # Basic plot with MA
-        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[0.7, 0.3])
+        
+        # Define multiple plots
+        fig = make_subplots(rows = 3, 
+                            cols = 1, 
+                            shared_xaxes = True, 
+                            vertical_spacing = 0.1, 
+                            row_heights = [1, 0.7, 0.4])
 
+        # Asset behavior
         fig.add_trace(
-            go.Scatter(x=data["date"], y=data["close"], mode="lines", name="Close", line=dict(color="black")),
-            row=1,
-            col=1,
+            go.Candlestick(x = data['date'],
+                        open = data['open'],
+                        high = data['high'],
+                        low = data['low'],
+                        close = data['close'],
+                        name = "Candlestick"),
+            row = 1,
+            col = 1,
+        )
+        
+        # Moving average
+        fig.add_trace(
+            go.Scatter(x = data["date"],
+                       y = data["MA"], 
+                       mode = "lines", 
+                       name = "MA", 
+                       line = dict(color = "black", dash = "dashdot")), 
+            row = 1, 
+            col = 1
         )
 
+        # Sthochastic Oscilator
         fig.add_trace(
-            go.Scatter(x=data["date"], y=data["MA"], mode="lines", name="MA", line=dict(color="green")), row=1, col=1
+            go.Scatter(x = data["date"], 
+                       y = data["pctK"], 
+                       name = "%K", 
+                       line = dict(color="#FF8300")), 
+            row = 2, 
+            col = 1
         )
+        fig.add_trace(
+            go.Scatter(x = data["date"], 
+                       y = data["pctD"], 
+                       name = "%D", 
+                       line = dict(color = "green")), 
+            row = 2, 
+            col = 1
+        )
+        
+        # Volume
+        fig.add_trace(go.Bar(x = data["date"], 
+                             y = data["volume"], 
+                             name = "Volume", 
+                             marker_color = "#875E5E"), 
+                      row = 3, 
+                      col = 1)
 
-        fig.add_trace(go.Bar(x=data["date"], y=data["volume"], name="Volume", marker_color="#FF8300"), row=2, col=1)
+        # Plot design
+        fig.add_hline(y = 80, row = 2, col = 1, line = dict(color = "red", dash = "dot"))
+        fig.add_hline(y = 20, row = 2, col = 1, line = dict(color = "green", dash = "dot"))
+        
+        fig.update_yaxes(title_text = "Close price", row = 1, col = 1)
+        fig.update_xaxes(title_text = "", row = 1, col = 1)
 
-        fig.update_yaxes(title_text="Close price", row=1, col=1)
-        fig.update_xaxes(title_text="Date", row=1, col=1)
+        fig.update_yaxes(title_text = "Stochastic", row = 2, col = 1)
+        fig.update_xaxes(title_text = "", row = 2, col = 1)
 
-        fig.update_yaxes(title_text="Volume", row=2, col=1)
-        fig.update_xaxes(title_text="Date", row=2, col=1)
+        fig.update_yaxes(title_text = "Volume", row = 3, col = 1)
+        fig.update_xaxes(title_text = "", row = 3, col = 1)
+        
 
         fig.update_layout(
-            title_text=f" ☑️​ Moving average and volume:​ {pair}",
-            showlegend=True,
-            height=height,
-            width=width,
-            xaxis=dict(
-                rangeselector=dict(
-                    buttons=list(
+            title_text = f" ☑️​ Technical analysis:​ {pair}",
+            showlegend = True,
+            height = height,
+            width = width,
+            xaxis = dict(
+                rangeselector = dict(
+                    buttons = list(
                         [
-                            dict(count=1, label="1m", step="month", stepmode="backward"),
-                            dict(count=6, label="6m", step="month", stepmode="backward"),
-                            dict(count=1, label="YTD", step="year", stepmode="todate"),
-                            dict(count=1, label="1y", step="year", stepmode="backward"),
-                            dict(step="all"),
+                            dict(count = 1, label = "1m", step = "month", stepmode = "backward"),
+                            dict(count = 6, label = "6m", step = "month", stepmode = "backward"),
+                            dict(count = 1, label = "YTD", step = "year", stepmode = "todate"),
+                            dict(count = 1, label = "1y", step = "year", stepmode = "backward"),
+                            dict(step = "all"),
                         ]
                     )
                 )
             ),
+            xaxis_rangeslider_visible = False
         )
 
         return fig
 
-    def graph_indicator(self, data, pair, width, height):
-        # Graph of indicator
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
-        fig.add_trace(
-            go.Scatter(x=data["date"], y=data["pctK"], name="%K", line=dict(color="#FF8300")),
-            secondary_y=False,
-        )
-        fig.add_trace(
-            go.Scatter(x=data["date"], y=data["pctD"], name="%D", line=dict(color="green")),
-            secondary_y=False,
-        )
-        fig.add_trace(
-            go.Scatter(x=data["date"], y=data["close"], name="Close", line=dict(color="black")),
-            secondary_y=True,
-        )
 
-        fig.update_layout(title_text=f"☑️​ Stochastic Oscillator: {pair}")
-        fig.update_xaxes(
-            rangeselector=dict(
-                buttons=list(
-                    [
-                        dict(count=1, label="1m", step="month", stepmode="backward"),
-                        dict(count=6, label="6m", step="month", stepmode="backward"),
-                        dict(count=1, label="YTD", step="year", stepmode="todate"),
-                        dict(count=1, label="1y", step="year", stepmode="backward"),
-                        dict(step="all"),
-                    ]
-                )
-            ),
-        )
-        fig.update_xaxes(title_text="Date")
-        fig.update_yaxes(title_text="Indicator (%K, %D)", secondary_y=False)
-        fig.update_yaxes(title_text="Close price", secondary_y=True)
-        fig.update_layout(width=width, height=height)
 
-        return fig
+
+
