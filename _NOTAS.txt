@@ -6,7 +6,7 @@ NOTAS AZIZ:
 - raise error en api response (usar custom exception)
 - custom exception, cambiarle el nombre quizás?
 - revisar TODOs: dentro del codigo
-
+- reproducción del entorno: solo he usado poetry y pip
 
 -------------------------
 

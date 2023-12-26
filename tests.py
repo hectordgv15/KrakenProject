@@ -50,11 +50,64 @@ class TestAnalysisClass(unittest.TestCase):
         self.assertTrue(all(output_data.loc[0] == expected_output_0))
         self.assertTrue(all(output_data.loc[1] == expected_output_1))
 
-    # def test_compute_indicators(self):
-    #     expected_output = []
+    def test_compute_indicators(self):
+        _ = self.analysis.get_data(**self.input_data)
+        output_data = self.analysis.compute_indicators(**self.input_data)
 
-    #     self.assertEqual(self.analysis.compute_indicators(self.input_1), expected_output)
-    #     self.assertEqual(self.analysis.compute_indicators(self.input_2), expected_output)
+        expected_output_0 = [
+            pd.to_datetime(1698364800, unit="s"),
+            34155.2,
+            34239.7,
+            33318.6,
+            33915.1,
+            2681.16178873,
+            29102.17692307692,
+            35225.0,
+            26820.0,
+            84.41522903033906,
+            87.80646459962247,
+            "Sell",
+        ]
+        expected_output_1 = [
+            pd.to_datetime(1698451200, unit="s"),
+            33915.1,
+            34463.7,
+            33852.8,
+            34092.1,
+            1222.22173256,
+            29355.684615384613,
+            35225.0,
+            26820.1,
+            86.52095801258788,
+            86.14130211372418,
+            "Buy",
+        ]
+
+        expected_columns = [
+            "date",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "MA",
+            "period_high",
+            "period_low",
+            "pctK",
+            "pctD",
+            "signal",
+        ]
+
+        self.assertTrue(len(output_data) > 0)
+        self.assertTrue(all(output_data.columns == expected_columns))
+
+        self.assertTrue(all(output_data.loc[0] == expected_output_0))
+        self.assertTrue(all(output_data.loc[1] == expected_output_1))
+
+        self.assertTrue(all(output_data["pctK"] >= 0) and all(output_data["pctK"] <= 100))
+        self.assertTrue(all(output_data["pctD"] >= 0) and all(output_data["pctD"] <= 100))
+
+        self.assertTrue(set(output_data["signal"].unique()) == {"Buy", "Sell"})
 
 
 if __name__ == "__main__":
