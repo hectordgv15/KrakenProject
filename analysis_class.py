@@ -64,14 +64,19 @@ class Analysis:
     def get_crypto_pairs(self):
         url = "https://api.kraken.com/0/public/AssetPairs"
         response = requests.get(url)
+        common_pairs = ["ETHUSD", "BTCUSD", "USDTUSD", "XRPUSD", "USDCUSD", "SOLUSD", "ADAUSD", "DOGEUSD", "TRXUSD"]
 
         try:
             pairs_data = response.json()
-            pairs = pairs_data["result"].keys()
+            pairs = list(pairs_data["result"].keys())
+
+            # Show common pairs first
+            pairs = common_pairs + ["---------"] + pairs
             return pairs
 
         except:
-            return ["BTCUSD", "ETHUSD", "USDTUSD", "XRPUSD", "USDCUSD", "SOLUSD", "ADAUASD", "DOGEUSD", "TRXUSD"]
+            print("Warning: getting default pairs")
+            return common_pairs
 
     def compute_indicators(self, pair="BTCUSD", interval=1440, **kwargs):
         """
@@ -93,13 +98,12 @@ class Analysis:
         try:
             # Compute stochastic oscillator
             data["MA"] = data["close"].rolling(window=model_config["window_size_ma"]).mean()
-            
+
             data["period_high"] = data["high"].rolling(model_config["stochastic_window"]).max()
             data["period_low"] = data["low"].rolling(model_config["stochastic_window"]).min()
             data["pctK"] = ((data["close"] - data["period_low"]) / (data["period_high"] - data["period_low"])) * 100
             data["pctD"] = data["pctK"].rolling(model_config["stochastic_nmean"]).mean()
-            
-                
+
             data = data.dropna().reset_index(drop=True)
 
             # Define sell and buy signals
@@ -112,103 +116,72 @@ class Analysis:
         except Exception as e:
             raise DashboardException(e, sys)
 
-
     def graph_pair(self, data, pair, width, height):
-        
         # Define multiple plots
-        fig = make_subplots(rows = 3, 
-                            cols = 1, 
-                            shared_xaxes = True, 
-                            vertical_spacing = 0.1, 
-                            row_heights = [1, 0.7, 0.4])
+        fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[1, 0.7, 0.4])
 
         # Asset behavior
         fig.add_trace(
-            go.Candlestick(x = data['date'],
-                        open = data['open'],
-                        high = data['high'],
-                        low = data['low'],
-                        close = data['close'],
-                        name = "Candlestick"),
-            row = 1,
-            col = 1,
+            go.Candlestick(
+                x=data["date"],
+                open=data["open"],
+                high=data["high"],
+                low=data["low"],
+                close=data["close"],
+                name="Candlestick",
+            ),
+            row=1,
+            col=1,
         )
-        
+
         # Moving average
         fig.add_trace(
-            go.Scatter(x = data["date"],
-                       y = data["MA"], 
-                       mode = "lines", 
-                       name = "MA", 
-                       line = dict(color = "black", dash = "dashdot")), 
-            row = 1, 
-            col = 1
+            go.Scatter(
+                x=data["date"], y=data["MA"], mode="lines", name="MA", line=dict(color="black", dash="dashdot")
+            ),
+            row=1,
+            col=1,
         )
 
         # Sthochastic Oscilator
-        fig.add_trace(
-            go.Scatter(x = data["date"], 
-                       y = data["pctK"], 
-                       name = "%K", 
-                       line = dict(color="#FF8300")), 
-            row = 2, 
-            col = 1
-        )
-        fig.add_trace(
-            go.Scatter(x = data["date"], 
-                       y = data["pctD"], 
-                       name = "%D", 
-                       line = dict(color = "green")), 
-            row = 2, 
-            col = 1
-        )
-        
+        fig.add_trace(go.Scatter(x=data["date"], y=data["pctK"], name="%K", line=dict(color="#FF8300")), row=2, col=1)
+        fig.add_trace(go.Scatter(x=data["date"], y=data["pctD"], name="%D", line=dict(color="green")), row=2, col=1)
+
         # Volume
-        fig.add_trace(go.Bar(x = data["date"], 
-                             y = data["volume"], 
-                             name = "Volume", 
-                             marker_color = "#875E5E"), 
-                      row = 3, 
-                      col = 1)
+        fig.add_trace(go.Bar(x=data["date"], y=data["volume"], name="Volume", marker_color="#875E5E"), row=3, col=1)
 
         # Plot design
-        fig.add_hline(y = 80, row = 2, col = 1, line = dict(color = "red", dash = "dot"))
-        fig.add_hline(y = 20, row = 2, col = 1, line = dict(color = "green", dash = "dot"))
-        
-        fig.update_yaxes(title_text = "Close price", row = 1, col = 1)
-        fig.update_xaxes(title_text = "", row = 1, col = 1)
+        fig.add_hline(y=80, row=2, col=1, line=dict(color="red", dash="dot"))
+        fig.add_hline(y=20, row=2, col=1, line=dict(color="green", dash="dot"))
 
-        fig.update_yaxes(title_text = "Stochastic", row = 2, col = 1)
-        fig.update_xaxes(title_text = "", row = 2, col = 1)
+        fig.update_yaxes(title_text="Close price", row=1, col=1)
+        fig.update_xaxes(title_text="", row=1, col=1)
 
-        fig.update_yaxes(title_text = "Volume", row = 3, col = 1)
-        fig.update_xaxes(title_text = "", row = 3, col = 1)
-        
+        fig.update_yaxes(title_text="Stochastic", row=2, col=1)
+        fig.update_xaxes(title_text="", row=2, col=1)
+
+        fig.update_yaxes(title_text="Volume", row=3, col=1)
+        fig.update_xaxes(title_text="", row=3, col=1)
 
         fig.update_layout(
-            title_text = f" ☑️​ Technical analysis:​ {pair}",
-            showlegend = True,
-            height = height,
-            width = width,
-            xaxis = dict(
-                rangeselector = dict(
-                    buttons = list(
+            title_text=f" ☑️​ Technical analysis:​ {pair}",
+            showlegend=True,
+            height=height,
+            width=width,
+            xaxis=dict(
+                rangeselector=dict(
+                    buttons=list(
                         [
-                            dict(count = 1, label = "1m", step = "month", stepmode = "backward"),
-                            dict(count = 6, label = "6m", step = "month", stepmode = "backward"),
-                            dict(count = 1, label = "YTD", step = "year", stepmode = "todate"),
-                            dict(count = 1, label = "1y", step = "year", stepmode = "backward"),
-                            dict(step = "all"),
+                            dict(count=1, label="1m", step="month", stepmode="backward"),
+                            dict(count=6, label="6m", step="month", stepmode="backward"),
+                            dict(count=1, label="YTD", step="year", stepmode="todate"),
+                            dict(count=1, label="1y", step="year", stepmode="backward"),
+                            dict(step="all"),
                         ]
                     )
                 )
             ),
-            xaxis_rangeslider_visible = False
+            xaxis_rangeslider_visible=False,
         )
 
         return fig
-
-
-
-
-

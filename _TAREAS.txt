@@ -3,12 +3,12 @@
 [X] Graficar cotizaciones. Input de usuario que permita graficar cualquier cotización o una a elegir en el menú (2 puntos).
 
 [X] Calcular el estocástico y graficarlo (1 puntos).
-[-] Calcular el estocástico sobre una media móvil (1 puntos).
+[X] Calcular el estocástico sobre una media móvil (1 puntos).
 [X] Graficar el indicador junto con la cotización del par calculado (1 punto).
 
 [X] Funciones (0,5 puntos)
 [X] Utilización de clases (0,5 puntos)
-[-] Manejo de errores y excepciones (0,5 puntos)
+[X] Manejo de errores y excepciones (0,5 puntos)
 
 - Memoria. (2 puntos)
 [ ] Descripción de cómo se ha afrontado el proyecto y por qué. (Hector)
@@ -24,7 +24,9 @@
 [ ] Mejor manejo de errores (Hector)
 [X] Incluir mayor cantidad de activos a través del API de Kraken (Hector)
 [X] Usar "krakenex" en vez de "pykrakenexapi"
-[ ] Filtrar activos más comunes
+[X] Filtrar activos más comunes
+[ ] Revisar avisos de compra y venta (creo que no son del todo correctos)
+
 
 Preguntas:
 1. Cálculo del estocástico sobre media móvil (URGENTE)
