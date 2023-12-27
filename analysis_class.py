@@ -28,7 +28,7 @@ class Analysis:
 
     def get_data(self, pair="BTCUSD", interval=1440, **kwargs):
         """
-        This function allows us to calculate the stochastic Oscillator.
+        This function allows us to obtain the historical asset data.
         The second argument refers to the time interval for the data
         in seconds; for example, to display daily data we need
         indicates how many seconds there are in a day.
@@ -106,8 +106,14 @@ class Analysis:
 
             data = data.dropna().reset_index(drop=True)
 
-            # Define sell and buy signals
-            data["signal"] = np.where(data["pctK"] > data["pctD"], "Buy", "Sell")
+            # Define buy and sell signals based on %K and %D crossover
+            data["Buy_Signal"] = np.where((data["pctK"] > data["pctD"]) & (data["pctK"].shift(1) < data["pctD"].shift(1)), 1, 0)
+            data["Sell_Signal"] = np.where((data["pctK"] < data["pctD"]) & (data["pctK"].shift(1) > data["pctD"].shift(1)), 1, 0)
+
+            # Define overbought and oversold signals
+            data["Overbought_Signal"] = np.where((data["pctK"] > 80) & (data["pctK"].shift(1) < 80), 1, 0)
+            data["Oversold_Signal"] = np.where((data["pctK"] < 20) & (data["pctK"].shift(1) > 20), 1, 0)
+  
 
             self.data_cache[pair]["data"] = data
 

@@ -56,7 +56,7 @@ if __name__=='__main__':
         showData = st.multiselect(
             "Filter: ",
             filtered_data.columns,
-            default=["date", "open", "high", "close", "volume", "pctK", "pctD", "signal"],
+            default=["date", "open", "high", "close", "volume", "pctK", "pctD", "Overbought_Signal", "Oversold_Signal"],
         )
 
         st.dataframe(filtered_data[showData], use_container_width=True)
@@ -64,9 +64,8 @@ if __name__=='__main__':
 
 
     # Additional information in boxes
-    count_cat = filtered_data["signal"].value_counts()
-    cat_buy = count_cat["Buy"]
-    cat_sell = count_cat["Sell"]
+    cat_buy = filtered_data["Overbought_Signal"].sum()
+    cat_sell = filtered_data["Oversold_Signal"].sum()
 
     avg_return = filtered_data["close"].pct_change().mean() * 100
     avg_price = filtered_data["close"].mean()
@@ -82,11 +81,11 @@ if __name__=='__main__':
         st.metric(label="Daily", value=f"{avg_price:,.2f}")
 
     with value3:
-        st.info("Buy signals", icon="🚨")
+        st.info("Overbought signals", icon="🚨")
         st.metric(label="Times", value=f"{cat_buy:,.0f}")
 
     with value4:
-        st.info("Sell signals", icon="🚨")
+        st.info("Oversold signals", icon="🚨")
         st.metric(label="Times", value=f"{cat_sell:,.0f}")
 
 
