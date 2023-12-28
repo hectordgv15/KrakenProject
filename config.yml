@@ -1,4 +1,10 @@
 model:
-  stochastic_window: 14  # Compute indicator
-  stochastic_nmean: 3  # Compute indicator
-  window_size_ma: 26  # Compute MA
+  stochastic_window: 14  # Indicator
+  stochastic_nmean: 3  # Indicator
+
+  interval: 1440 # Data
+  window_size_ma: 26  # Data
+  
+  days_plot_default: 365 # Visual
+  w_plot: 1000 # Visual
+  h_plot: 600 # Visual
