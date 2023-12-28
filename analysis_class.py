@@ -14,8 +14,7 @@ from utils import process_response
 class Analysis:
     def __init__(self):
         self.get_conection()
-        self.config = self.load_config()
-        self.model_config = self.config["model"]
+        self.load_config()
         self.data_cache = {}
 
     def get_conection(self):
@@ -24,7 +23,7 @@ class Analysis:
     def load_config(self, config_path="config.yml"):
         with open(config_path, "r") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
-        return config
+        self.config = config
 
     def get_data(self, pair="BTCUSD", interval=None, **kwargs):
         """
@@ -34,7 +33,7 @@ class Analysis:
         indicates how many seconds there are in a day.
         """
         if interval is None:
-            interval = self.model_config["interval"]
+            interval = self.config["data"]["interval"]
 
         try:
             data = self.data_cache.get(pair, {}).get("raw", "NO_DATA")
@@ -50,7 +49,7 @@ class Analysis:
 
                 # Response error raise
                 if response["error"]:
-                    raise response["error"][0]
+                    raise DashboardException(response["error"][0], sys)
 
                 # Process response
                 data = process_response(response)
@@ -88,7 +87,7 @@ class Analysis:
         indicates how many seconds there are in a day.
         """
         if interval is None:
-            interval = self.model_config["interval"]
+            interval = self.config["data"]["interval"]
 
         raw_data = self.data_cache.get(pair, {}).get("raw", "NO_DATA")
 
@@ -100,12 +99,12 @@ class Analysis:
 
         try:
             # Compute stochastic oscillator
-            data["MA"] = data["close"].rolling(window=self.model_config["window_size_ma"]).mean()
+            data["MA"] = data["close"].rolling(window=self.config["data"]["window_size_ma"]).mean()
 
-            data["period_high"] = data["high"].rolling(self.model_config["stochastic_window"]).max()
-            data["period_low"] = data["low"].rolling(self.model_config["stochastic_window"]).min()
+            data["period_high"] = data["high"].rolling(self.config["model"]["stochastic_window"]).max()
+            data["period_low"] = data["low"].rolling(self.config["model"]["stochastic_window"]).min()
             data["pctK"] = ((data["close"] - data["period_low"]) / (data["period_high"] - data["period_low"])) * 100
-            data["pctD"] = data["pctK"].rolling(self.model_config["stochastic_nmean"]).mean()
+            data["pctD"] = data["pctK"].rolling(self.config["model"]["stochastic_nmean"]).mean()
 
             data = data.dropna().reset_index(drop=True)
 
@@ -176,7 +175,7 @@ class Analysis:
         fig.update_xaxes(title_text="", row=3, col=1)
 
         fig.update_layout(
-            title_text=f" ☑️​ Technical analysis:​ {pair}",
+            title_text=f" ☑️​ Technical analysis: {pair}",
             showlegend=True,
             height=height,
             width=width,

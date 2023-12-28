@@ -1,10 +1,12 @@
 # Import libraries
 # Data process
 import pandas as pd
+import sys
 
 # Utils
 from utils import select_box_date
 from analysis_class import Analysis
+from exception import DashboardException
 
 # Streamlit
 import streamlit as st
@@ -14,38 +16,35 @@ import streamlit as st
 class CryptoAnalysisApp:
     def __init__(self):
         self.analysis = Analysis()
-        model_config_dash = self.analysis.config["model"]
-
-        self.interval = model_config_dash["interval"]
-        self.days_plot_default = model_config_dash["days_plot_default"]
-        self.w_plot = model_config_dash["w_plot"]
-        self.h_plot = model_config_dash["h_plot"]
+        self.config = self.analysis.config
 
     def run(self):
         st.set_page_config(layout="wide")
         self.display_title()
         self.display_sidebar()
+        self.display_additional_info()
+        self.display_graph()
 
     def display_title(self):
-        st.title("STOCHASTIC OSCILLATOR FOR CRYPTOCURRENCIES")
-        st.subheader("🔔 This is an interactive site where you can see the behavior of all cryptocurrencies")
+        st.title(self.config["text"]["title"])
+        st.subheader("🔔 " + self.config["text"]["subtitle"])
 
     def display_sidebar(self):
         try:
-            st.sidebar.image("./images/Logov2.png", caption="Technological platform for financial services")
+            st.sidebar.image(self.config["logo"]["path"], caption=self.config["logo"]["caption"])
 
             ticker_options = self.analysis.get_crypto_pairs()
-            selected_asset = st.sidebar.selectbox("Which asset do you want to see?", ticker_options)
+            self.selected_asset = st.sidebar.selectbox(self.config["text"]["asset_selectbox"], ticker_options)
 
-            asset_data = self.analysis.get_data(pair=selected_asset, interval=self.interval)
-            asset_data = self.analysis.compute_indicators(pair=selected_asset, interval=self.interval)
+            asset_data = self.analysis.get_data(pair=self.selected_asset)
+            asset_data = self.analysis.compute_indicators(pair=self.selected_asset)
 
-            selected_date = select_box_date(asset_data)
+            start_date, end_date = select_box_date(asset_data)
             filtered_data = asset_data[
-                asset_data["date"].between(pd.to_datetime(selected_date[0]), pd.to_datetime(selected_date[1]))
+                asset_data["date"].between(pd.to_datetime(start_date), pd.to_datetime(end_date))
             ]
 
-            with st.expander("💹​ Asset information"):
+            with st.expander("💹​ " + self.config["text"]["data_expander"]):
                 showData = st.multiselect(
                     "Filter: ",
                     filtered_data.columns,
@@ -63,18 +62,18 @@ class CryptoAnalysisApp:
                 )
                 st.dataframe(filtered_data[showData], use_container_width=True)
 
-            self.display_additional_info(filtered_data)
-            self.display_graph(filtered_data, selected_asset)
+            self.filtered_data = filtered_data
 
-        except:
-            st.warning("You have chosen the wrong option", icon="⚠️")
+        except Exception as e:
+            st.warning(self.config["text"]["asset_warning"], icon="⚠️")
+            raise DashboardException(e, sys)
 
-    def display_additional_info(self, filtered_data):
-        cat_buy = filtered_data["Overbought_Signal"].sum()
-        cat_sell = filtered_data["Oversold_Signal"].sum()
+    def display_additional_info(self):
+        cat_buy = self.filtered_data["Overbought_Signal"].sum()
+        cat_sell = self.filtered_data["Oversold_Signal"].sum()
 
-        avg_return = filtered_data["close"].pct_change().mean() * 100
-        avg_price = filtered_data["close"].mean()
+        avg_return = self.filtered_data["close"].pct_change().mean() * 100
+        avg_price = self.filtered_data["close"].mean()
 
         value1, value2, value3, value4 = st.columns(4, gap="medium")
 
@@ -94,8 +93,10 @@ class CryptoAnalysisApp:
             st.info("Oversold signals", icon="🚨")
             st.metric(label="Times", value=f"{cat_sell:,.0f}")
 
-    def display_graph(self, filtered_data, selected_asset):
-        fig = self.analysis.graph_pair(filtered_data, selected_asset, self.w_plot, self.h_plot)
+    def display_graph(self):
+        fig = self.analysis.graph_pair(
+            self.filtered_data, self.selected_asset, self.config["visual"]["w_plot"], self.config["visual"]["h_plot"]
+        )
         st.plotly_chart(fig)
 
 
