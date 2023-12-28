@@ -2,8 +2,9 @@ import unittest
 import pandas as pd
 
 # from dashboard import # TODO
-from utils import select_box_date, process_response
-from model import CryptoAnalysisModel
+from crypto_analysis.utils import select_box_date, process_response
+from crypto_analysis.model import CryptoAnalysisModel
+from crypto_analysis.app import CryptoAnalysisApp
 
 
 class TestUtils(unittest.TestCase):
@@ -38,59 +39,6 @@ class TestAnalysisClass(unittest.TestCase):
     def setUp(self):
         self.analysis = CryptoAnalysisModel()
         self.input_data = {"pair": "BTCUSD", "interval": 1440, "since": 1696118400, "until": 1696377600}
-        # self.expected_output_0 = [
-        #     pd.to_datetime(1698364800, unit="s"),
-        #     34155.2,
-        #     34239.7,
-        #     33318.6,
-        #     33915.1,
-        #     2681.16178873,
-        #     29102.17692307692,
-        #     35225.0,
-        #     26820.0,
-        #     84.41522903033906,
-        #     87.80646459962247,
-        #     0,
-        #     0,
-        #     0,
-        #     0,
-        # ]
-
-        # self.expected_output_1 = [
-        #     pd.to_datetime(1698451200, unit="s"),
-        #     33915.1,
-        #     34463.7,
-        #     33852.8,
-        #     34092.1,
-        #     1222.22173256,
-        #     29355.684615384613,
-        #     35225.0,
-        #     26820.1,
-        #     86.52095801258788,
-        #     86.14130211372418,
-        #     1,
-        #     0,
-        #     0,
-        #     0,
-        # ]
-
-        # self.expected_columns = [
-        #     "date",
-        #     "open",
-        #     "high",
-        #     "low",
-        #     "close",
-        #     "volume",
-        #     "MA",
-        #     "period_high",
-        #     "period_low",
-        #     "pctK",
-        #     "pctD",
-        #     "Buy_Signal",
-        #     "Sell_Signal",
-        #     "Overbought_Signal",
-        #     "Oversold_Signal",
-        # ]
 
         data = {
             "date": [

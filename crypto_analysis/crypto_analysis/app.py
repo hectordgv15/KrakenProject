@@ -96,9 +96,3 @@ class CryptoAnalysisApp:
     def display_graph(self):
         fig = self.analysis.graph_pair(self.filtered_data, self.selected_asset)
         st.plotly_chart(fig)
-
-
-# Run app
-if __name__ == "__main__":
-    app = CryptoAnalysisApp()
-    app.run()
