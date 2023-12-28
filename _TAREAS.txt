@@ -11,11 +11,23 @@
 [X] Manejo de errores y excepciones (0,5 puntos)
 
 - Memoria. (2 puntos)
-[ ] Descripción de cómo se ha afrontado el proyecto y por qué. (Hector)
-[ ] Descripción detallada de cada uno de los puntos que se evalúan. (Hector)
+[/] Descripción de cómo se ha afrontado el proyecto y por qué. (Hector)
+[/] Descripción detallada de cada uno de los puntos que se evalúan. (Hector)
 [ ] Descripción de la estructura del código y estructura de ficheros. (Aziz)
 [ ] Descripción de la forma de ejecución del código. (Aziz)
 [ ] Pantallazos de todo Aquel punto que requiera algún tipo de visualización. (Hector)
+
+
+1. intro
+2. ---
+    2.1 Descarga de datos
+    2.2 Graf
+    2.3
+    ...
+    2.6
+3. Estructura del proyecto
+4. ejecución
+
 
 - Extra.
 [X] Testeo y cobertura (unit-testing, integration-testing) 0,25 puntos (Aziz)

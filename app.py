@@ -5,7 +5,7 @@ import sys
 
 # Utils
 from utils import select_box_date
-from analysis_class import Analysis
+from model import CryptoAnalysisModel
 from exception import DashboardException
 
 # Streamlit
@@ -15,7 +15,7 @@ import streamlit as st
 # Define dashboard class
 class CryptoAnalysisApp:
     def __init__(self):
-        self.analysis = Analysis()
+        self.analysis = CryptoAnalysisModel()
         self.config = self.analysis.config
 
     def run(self):
@@ -94,9 +94,7 @@ class CryptoAnalysisApp:
             st.metric(label="Times", value=f"{cat_sell:,.0f}")
 
     def display_graph(self):
-        fig = self.analysis.graph_pair(
-            self.filtered_data, self.selected_asset, self.config["visual"]["w_plot"], self.config["visual"]["h_plot"]
-        )
+        fig = self.analysis.graph_pair(self.filtered_data, self.selected_asset)
         st.plotly_chart(fig)
 
 

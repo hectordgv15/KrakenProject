@@ -11,7 +11,7 @@ from plotly.subplots import make_subplots
 from utils import process_response
 
 
-class Analysis:
+class CryptoAnalysisModel:
     def __init__(self):
         self.get_conection()
         self.load_config()
@@ -65,19 +65,19 @@ class Analysis:
     def get_crypto_pairs(self):
         url = "https://api.kraken.com/0/public/AssetPairs"
         response = requests.get(url)
-        common_pairs = ["ETHUSD", "BTCUSD", "USDTUSD", "XRPUSD", "USDCUSD", "SOLUSD", "ADAUSD", "DOGEUSD", "TRXUSD"]
+        default_pairs = ["ETHUSD", "BTCUSD", "USDTUSD", "XRPUSD", "USDCUSD", "SOLUSD", "ADAUSD", "DOGEUSD", "TRXUSD"]
 
         try:
             pairs_data = response.json()
             pairs = list(pairs_data["result"].keys())
 
             # Show common pairs first
-            pairs = common_pairs + ["---------"] + pairs
+            pairs = default_pairs + ["---------"] + pairs
             return pairs
 
         except:
-            print("Warning: getting default pairs")
-            return common_pairs
+            print("Warning: Getting default pairs")
+            return default_pairs
 
     def compute_indicators(self, pair="BTCUSD", interval=None, **kwargs):
         """
@@ -110,10 +110,14 @@ class Analysis:
 
             # Define buy and sell signals based on %K and %D crossover
             data["Buy_Signal"] = np.where(
-                (data["pctK"] > data["pctD"]) & (data["pctK"].shift(1) < data["pctD"].shift(1)), 1, 0
+                (data["pctK"] > data["pctD"]) & (data["pctK"].shift(1) < data["pctD"].shift(1)) & (data["pctK"] < 20),
+                1,
+                0,
             )
             data["Sell_Signal"] = np.where(
-                (data["pctK"] < data["pctD"]) & (data["pctK"].shift(1) > data["pctD"].shift(1)), 1, 0
+                (data["pctK"] < data["pctD"]) & (data["pctK"].shift(1) > data["pctD"].shift(1)) & (data["pctK"] > 80),
+                1,
+                0,
             )
 
             # Define overbought and oversold signals
@@ -127,7 +131,7 @@ class Analysis:
         except Exception as e:
             raise DashboardException(e, sys)
 
-    def graph_pair(self, data, pair, width, height):
+    def graph_pair(self, data, pair):
         # Define multiple plots
         fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.1, row_heights=[2, 0.7, 0.5])
 
@@ -177,8 +181,8 @@ class Analysis:
         fig.update_layout(
             title_text=f" ☑️​ Technical analysis: {pair}",
             showlegend=True,
-            height=height,
-            width=width,
+            height=self.config["visual"]["h_plot"],
+            width=self.config["visual"]["w_plot"],
             xaxis=dict(
                 rangeselector=dict(
                     buttons=list(
