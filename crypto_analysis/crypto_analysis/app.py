@@ -1,18 +1,14 @@
 # Import libraries
-# Data process
 import pandas as pd
+import streamlit as st
 import sys
 
-# Utils
-from utils import select_box_date
-from model import CryptoAnalysisModel
-from exception import DashboardException
-
-# Streamlit
-import streamlit as st
+from crypto_analysis.utils import select_box_date
+from crypto_analysis.model import CryptoAnalysisModel
+from crypto_analysis.exception import DashboardException
 
 
-# Define dashboard class
+# Application deployment class
 class CryptoAnalysisApp:
     def __init__(self):
         self.analysis = CryptoAnalysisModel()
@@ -66,33 +62,40 @@ class CryptoAnalysisApp:
 
         except Exception as e:
             st.warning(self.config["text"]["asset_warning"], icon="⚠️")
-            raise DashboardException(e, sys)
+            raise DashboardException(e, "DATA BUILD")
 
     def display_additional_info(self):
-        cat_buy = self.filtered_data["Overbought_Signal"].sum()
-        cat_sell = self.filtered_data["Oversold_Signal"].sum()
+        try:
+            cat_buy = self.filtered_data["Overbought_Signal"].sum()
+            cat_sell = self.filtered_data["Oversold_Signal"].sum()
 
-        avg_return = self.filtered_data["close"].pct_change().mean() * 100
-        avg_price = self.filtered_data["close"].mean()
+            avg_return = self.filtered_data["close"].pct_change().mean() * 100
+            avg_price = self.filtered_data["close"].mean()
 
-        value1, value2, value3, value4 = st.columns(4, gap="medium")
+            value1, value2, value3, value4 = st.columns(4, gap="medium")
 
-        with value1:
-            st.info("Average return", icon="🚨")
-            st.metric(label="Daily", value=f"{avg_return:,.2f}%")
+            with value1:
+                st.info("Average return", icon="🚨")
+                st.metric(label="Daily", value=f"{avg_return:,.2f}%")
 
-        with value2:
-            st.info("Average price", icon="🚨")
-            st.metric(label="Daily", value=f"{avg_price:,.2f}")
+            with value2:
+                st.info("Average price", icon="🚨")
+                st.metric(label="Daily", value=f"{avg_price:,.2f}")
 
-        with value3:
-            st.info("Overbought signals", icon="🚨")
-            st.metric(label="Times", value=f"{cat_buy:,.0f}")
+            with value3:
+                st.info("Overbought signals", icon="🚨")
+                st.metric(label="Times", value=f"{cat_buy:,.0f}")
 
-        with value4:
-            st.info("Oversold signals", icon="🚨")
-            st.metric(label="Times", value=f"{cat_sell:,.0f}")
+            with value4:
+                st.info("Oversold signals", icon="🚨")
+                st.metric(label="Times", value=f"{cat_sell:,.0f}")
+
+        except Exception as e:
+            raise DashboardException(e, "INDICATORS BUILD")
 
     def display_graph(self):
-        fig = self.analysis.graph_pair(self.filtered_data, self.selected_asset)
-        st.plotly_chart(fig)
+        try:
+            fig = self.analysis.graph_pair(self.filtered_data, self.selected_asset)
+            st.plotly_chart(fig)
+        except Exception as e:
+            raise DashboardException(e, "GRAPH BUILD")
