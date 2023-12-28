@@ -34,14 +34,14 @@ def process_response(response):
 
 
 # Select date and asset
-def select_box_date(asset_data, days_plot):
+def select_box_date(asset_data):
     """
     This function generates the box to select a specific range of dates.
     """
 
     start_date = st.sidebar.date_input(
         "Start date",
-        (datetime.today() - timedelta(days=days_plot)),
+        asset_data["date"].min(),
         min_value=asset_data["date"].min(),
         max_value=asset_data["date"].max(),
     )
