@@ -18,17 +18,6 @@
 [ ] Pantallazos de todo Aquel punto que requiera algún tipo de visualización. (Hector)
 
 
-1. intro
-2. ---
-    2.1 Descarga de datos
-    2.2 Graf
-    2.3
-    ...
-    2.6
-3. Estructura del proyecto
-4. ejecución
-
-
 - Extra.
 [X] Testeo y cobertura (unit-testing, integration-testing) 0,25 puntos (Aziz)
 [X] Facilitar los mecanismos para la reproducción del entorno virtual (ya sea con Poetry, Pipenv o pip) 0,25 puntos (Aziz)
@@ -44,4 +33,29 @@ Preguntas:
 1. Cálculo del estocástico sobre media móvil (URGENTE)
 2. Graficar volumen del activo [DONE]
 3. integration testing?
+
+
+crypto_analysis
+    ├── config.yml
+    ├── crypto_analysis
+    │   ├── __init__.py
+    │   ├── app.py
+    │   ├── exception.py
+    │   ├── model.py
+    │   └── utils.py
+    ├── dist
+    │   ├── crypto_analysis-0.1.0-py3-none-any.whl
+    │   └── crypto_analysis-0.1.0.tar.gz
+    ├── images
+    │   ├── Logov1.png
+    │   └── Logov2.png
+    ├── tests
+    │   ├── test_app.py
+    │   ├── test_model.py
+    │   └── test_utils.py
+    ├── pyproject.toml
+    ├── README.md
+    ├── requirements.txt
+    ├── run.py
+    └── setup.py
 

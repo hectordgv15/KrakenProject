@@ -4,9 +4,9 @@ import pandas as pd
 from crypto_analysis.model import CryptoAnalysisModel
 
 
-class TestAnalysisClass(unittest.TestCase):
+class TestCryptoAnalysisModel(unittest.TestCase):
     def setUp(self):
-        self.analysis = CryptoAnalysisModel()
+        self.model = CryptoAnalysisModel()
         self.input_data = {"pair": "BTCUSD", "interval": 1440, "since": 1696118400, "until": 1696377600}
 
         data = {
@@ -33,16 +33,16 @@ class TestAnalysisClass(unittest.TestCase):
         self.expected_output = pd.DataFrame(data, columns=data.keys())
 
     def test_get_conection(self):
-        self.analysis.get_conection()
-        self.assertTrue(self.analysis.connection is not None)
+        self.model.get_conection()
+        self.assertTrue(self.model.connection is not None)
 
     def test_load_config(self):
-        self.analysis.load_config()
-        self.assertTrue(self.analysis.config is not None)
-        self.assertTrue(isinstance(self.analysis.config, dict))
+        self.model.load_config()
+        self.assertTrue(self.model.config is not None)
+        self.assertTrue(isinstance(self.model.config, dict))
 
     def test_get_data(self):
-        output_data = self.analysis.get_data(**self.input_data)
+        output_data = self.model.get_data(**self.input_data)
 
         expected_output_0 = [pd.to_datetime(1696204800, unit="s"), 27981.1, 28572.5, 27298.0, 27500.9, 5477.09708743]
         expected_output_1 = [pd.to_datetime(1696291200, unit="s"), 27500.9, 27658.2, 27189.0, 27428.2, 2269.82042802]
@@ -52,17 +52,17 @@ class TestAnalysisClass(unittest.TestCase):
         self.assertTrue(all(output_data.loc[0] == expected_output_0))
         self.assertTrue(all(output_data.loc[1] == expected_output_1))
 
-        self.assertTrue(len(self.analysis.data_cache) > 0)
-        self.assertTrue("raw" in self.analysis.data_cache[self.input_data["pair"]])
+        self.assertTrue(len(self.model.data_cache) > 0)
+        self.assertTrue("raw" in self.model.data_cache[self.input_data["pair"]])
 
     def test_get_crypto_pairs(self):
         default_pairs = ["ETHUSD", "BTCUSD", "USDTUSD", "XRPUSD", "USDCUSD", "SOLUSD", "ADAUSD", "DOGEUSD", "TRXUSD"]
-        pairs = self.analysis.get_crypto_pairs()
+        pairs = self.model.get_crypto_pairs()
         self.assertTrue(set(default_pairs) <= set(pairs))
 
     def test_compute_indicators(self):
-        _ = self.analysis.get_data(**self.input_data)
-        output_data = self.analysis.compute_indicators(**self.input_data)
+        _ = self.model.get_data(**self.input_data)
+        output_data = self.model.compute_indicators(**self.input_data)
 
         self.assertTrue(len(output_data) > 0)
         self.assertTrue(all(output_data.columns == self.expected_output.columns))
@@ -79,11 +79,11 @@ class TestAnalysisClass(unittest.TestCase):
         self.assertTrue(set(output_data["Overbought_Signal"].unique()) <= {0, 1})
         self.assertTrue(set(output_data["Oversold_Signal"].unique()) <= {0, 1})
 
-        self.assertTrue(len(self.analysis.data_cache) > 0)
-        self.assertTrue("data" in self.analysis.data_cache[self.input_data["pair"]])
+        self.assertTrue(len(self.model.data_cache) > 0)
+        self.assertTrue("data" in self.model.data_cache[self.input_data["pair"]])
 
     def test_graph_pair(self):
-        fig = self.analysis.graph_pair(self.expected_output, "BTCUSD")
+        fig = self.model.graph_pair(self.expected_output, "BTCUSD")
         self.assertTrue(fig is not None)
 
 

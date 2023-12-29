@@ -1,5 +1,4 @@
 import yaml
-import sys
 import requests
 import krakenex
 import numpy as np
@@ -7,7 +6,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from crypto_analysis.utils import process_response
-from crypto_analysis.exception import DashboardException
+from crypto_analysis.exception import CryptoAnalysisException
+
+import os
 
 
 class CryptoAnalysisModel:
@@ -20,8 +21,12 @@ class CryptoAnalysisModel:
         self.connection = krakenex.API()
 
     def load_config(self, config_path="config.yml"):
+        if not os.path.exists(config_path):
+            config_path = os.path.join("crypto_analysis", config_path)
+
         with open(config_path, "r") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
+
         self.config = config
 
     def get_data(self, pair="BTCUSD", interval=None, **kwargs):
@@ -48,7 +53,7 @@ class CryptoAnalysisModel:
 
                 # Response error raise
                 if response["error"]:
-                    raise DashboardException(response["error"][0], "API CALL")
+                    raise CryptoAnalysisException(response["error"][0], "API CALL")
 
                 # Process response
                 data = process_response(response)
@@ -59,7 +64,7 @@ class CryptoAnalysisModel:
             return data
 
         except Exception as e:
-            raise DashboardException(e, "GET DATA")
+            raise CryptoAnalysisException(e, "GET DATA")
 
     def get_crypto_pairs(self):
         url = "https://api.kraken.com/0/public/AssetPairs"
@@ -128,7 +133,7 @@ class CryptoAnalysisModel:
             return data
 
         except Exception as e:
-            raise DashboardException(e, "COMPUTE INDICATORS")
+            raise CryptoAnalysisException(e, "COMPUTE INDICATORS")
 
     def graph_pair(self, data, pair):
         # Define multiple plots
