@@ -2,14 +2,19 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 
+from crypto_analysis.exception import CryptoAnalysisException
+
 
 def process_response(response):
+    """
+    This function processes the response from the API and returns a pandas.DataFrame.
+    """
     # Create pandas DataFrame
     asset = list(response["result"].keys())[0]
     data = pd.DataFrame(response["result"][asset])
 
     if data.empty:
-        raise "Warning: Empty response"
+        raise CryptoAnalysisException("Empy response data", "PROCESS RESPONSE")
 
     # Data columns
     data.columns = [
@@ -38,6 +43,7 @@ def select_box_date(asset_data):
     This function generates the box to select a specific range of dates.
     """
 
+    # Get start date, default to oldest date
     start_date = st.sidebar.date_input(
         "Start date",
         asset_data["date"].min(),
@@ -46,6 +52,7 @@ def select_box_date(asset_data):
     )
 
     try:
+        # Get end date, default to today
         end_date = st.sidebar.date_input(
             "End date",
             datetime.today(),
