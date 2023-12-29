@@ -22,11 +22,11 @@
 [X] Testeo y cobertura (unit-testing, integration-testing) 0,25 puntos (Aziz)
 [X] Facilitar los mecanismos para la reproducción del entorno virtual (ya sea con Poetry, Pipenv o pip) 0,25 puntos (Aziz)
 [ ] Distribución del proyecto a través de PyPi o una plataforma PaaS (AWS, Heroku, etc) 0,25 puntos (Aziz y Hector)
-[ ] Mejor manejo de errores (Hector)
+[X] Mejor manejo de errores (Hector)
 [X] Incluir mayor cantidad de activos a través del API de Kraken (Hector)
 [X] Usar "krakenex" en vez de "pykrakenexapi"
 [X] Filtrar activos más comunes
-[ ] Revisar avisos de compra y venta (creo que no son del todo correctos)
+[X] Revisar avisos de compra y venta (creo que no son del todo correctos)
 
 
 Preguntas:
