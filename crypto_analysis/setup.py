@@ -31,10 +31,11 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/azizelkadi/Proyecto-python",
     install_requirements=get_requirements("requirements.txt"),
-    classifiers=['programming Language :: Python :: 3',
-                 'license :: OSI Approved :: MIT License',
-                 'Operating System :: OS Independent'
-                 ],
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent'
+    ],
     python_requires='>=3.11',
     entry_points={
         'console_scripts':[
