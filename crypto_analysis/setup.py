@@ -21,10 +21,19 @@ def get_requirements(file_path: str) -> List[str]:
 
 
 setup(
-    name="crypto-analysis",
+    name="HACryptoAnalysis",
     version="0.0.1",
     author="Hector Gonzalez - Abdelaziz el Kadi",
-    author_email="",
+    author_email="hectordgv15@gmail.com",
     packages=find_packages(),
+    description="A web app to analyse cryptocurrency prices and use technical indicators",
+    long_description=open("README.md", "r").read(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/azizelkadi/Proyecto-python",
     install_requirements=get_requirements("requirements.txt"),
+    classifiers=['programming Language :: Python :: 3',
+                 'license :: OSI Approved :: MIT License',
+                 'Operating System :: OS Independent'
+                 ],
+    python_requires='>=3.11',
 )
