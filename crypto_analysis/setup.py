@@ -24,7 +24,7 @@ setup(
     name="HACryptoAnalysis",
     version="0.0.1",
     author="Hector Gonzalez - Abdelaziz el Kadi",
-    author_email="hectordgv15@gmail.com",
+    author_email="azizelkadi24@gmail.com",
     packages=find_packages(),
     description="A web app to analyse cryptocurrency prices and use technical indicators",
     long_description=open("README.md", "r").read(),
@@ -36,4 +36,9 @@ setup(
                  'Operating System :: OS Independent'
                  ],
     python_requires='>=3.11',
+    entry_points={
+        'console_scripts':[
+            'HACryptoAnalysis=crypto_analysis.run:main'
+        ]
+    }
 )
