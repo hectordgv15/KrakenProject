@@ -2,7 +2,6 @@
 import pandas as pd
 import streamlit as st
 import os
-from datetime import datetime
 
 from crypto_analysis.utils import select_box_date
 from crypto_analysis.model import CryptoAnalysisModel
@@ -67,8 +66,7 @@ class CryptoAnalysisApp:
             asset_data = self.model.compute_indicators(pair=self.selected_asset)
 
             # Display date selector
-            today_date = datetime.today()
-            start_date, end_date = select_box_date(asset_data, today_date)
+            start_date, end_date = select_box_date(asset_data)
 
             # Filter data by selected date range
             self.filtered_data = asset_data[

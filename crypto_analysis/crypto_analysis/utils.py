@@ -14,7 +14,7 @@ def process_response(response):
     data = pd.DataFrame(response["result"][asset])
 
     if data.empty:
-        raise CryptoAnalysisException("Empy response data", "PROCESS RESPONSE")
+        raise CryptoAnalysisException("Empty response data", "PROCESS RESPONSE")
 
     # Data columns
     data.columns = [

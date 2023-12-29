@@ -34,6 +34,8 @@ Preguntas:
 2. Graficar volumen del activo [DONE]
 3. integration testing?
 
+----------------------------------------------------------------
+Estructura del proyecto:
 
 crypto_analysis
     ├── config.yml
@@ -59,3 +61,19 @@ crypto_analysis
     ├── run.py
     └── setup.py
 
+El proyecto sigue una estructura simple y sencilla de entender, basada en la plantilla que genera Poetry.
+Consta del modulo principal: "crypto_analysis", donde se encuentra:
+- app.py: con la clase que genera y despliega el dashboard utilizando Streamlit
+- model.py: Con la clase que realiza la extracción y procesamiento de los datos de la API de kraken
+- exception.py: Con la clase que maneja las excepciones del proyecto
+- utils.py: con funciones auxiliares transversales a todo el proyecto
+
+En cuanto a la ejecución, se deben seguir los siguientes pasos:
+1. Descargar el codigo fuente del proyecto (TODO: indicar zip)
+, extraerlo y navegar hasta la localización del proyecto 
+
+2. Instalación de la librería del proyecto "crypto_analysis" usando pip, esto instalará todas las dependencias necesarias:
+    pip install .\dist\crypto_analysis-0.1.0-py3-none-any.whl
+
+3. Ejecutar run.py usando Streamlit, para desplegar el dashboard
+    streamlit run .\run.py

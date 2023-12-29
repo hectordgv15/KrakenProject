@@ -49,7 +49,7 @@ class TestUtils(unittest.TestCase):
         expected_start_date = pd.to_datetime(1698364800, unit="s")
         expected_end_date = (
             datetime.today().strftime("%Y/%m/%d"),
-            (datetime.today() + timedelta(days=1)).strftime("%Y/%m/%d"),
+            (datetime.today() - timedelta(days=1)).strftime("%Y/%m/%d"),
         )
 
         start_date, end_date = select_box_date(self.date_df)
