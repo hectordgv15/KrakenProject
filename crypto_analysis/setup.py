@@ -22,7 +22,7 @@ def get_requirements(file_path: str) -> List[str]:
 
 setup(
     name="HACryptoAnalysis",
-    version="0.0.1",
+    version="0.0.2",
     author="Hector Gonzalez - Abdelaziz el Kadi",
     author_email="azizelkadi24@gmail.com",
     packages=find_packages(),
@@ -36,7 +36,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent'
     ],
-    python_requires='>=3.11',
+    python_requires='>=3.10',
     entry_points={
         'console_scripts':[
             'HACryptoAnalysis=crypto_analysis.run:main'
